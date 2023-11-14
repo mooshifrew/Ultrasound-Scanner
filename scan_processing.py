@@ -1,5 +1,6 @@
 import serial
 import numpy as np
+import pyvista as pv
 
 port = input("What port is in use? (eg COM3): ")
 ser = serial.Serial(port, 9600)  # Adjust the port and baud rate to match Arduino
@@ -8,8 +9,8 @@ raw_data = []
 
 # scan conversion variables
 maxDistance = 25.0 # [cm]
-minDistance = 0 # [cm]
-sensor2CenterDistance = 12.5 # [cm]
+minDistance =  3 # [cm]
+sensor2CenterDistance = 9.5 #12.5 # [cm]
 
 while True:
     data = ser.readline().decode('utf-8').strip()
@@ -32,16 +33,17 @@ while True:
         # Process Data
         
         raw_data = np.array(raw_data)
-        raw_data[raw_data<0] = 0
+        raw_data[raw_data<minDistance] = None
         indices = np.where(raw_data==delimiter)
-        raw_data[raw_data>maxDistance]=maxDistance
+        raw_data[raw_data>maxDistance]= None#maxDistance
         indices = indices[0]
 
         # raw_data[raw_data>maxDistance] = np.NaN
    
-        r = np.zeros(len(indices)-1, indices[0])
+        r = np.zeros((len(indices)-1, indices[0]))
 
-        raw_data.to_csv('raw_data.csv')
+        #  raw_data.to_csv('raw_data.csv')
+        np.savetxt("ultrasound_data.txt",raw_data)
 
         r[0,:] = raw_data[0:indices[0]]
         for i in range(1,len(indices)-1):
