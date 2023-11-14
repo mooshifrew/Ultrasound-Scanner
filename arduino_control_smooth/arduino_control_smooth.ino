@@ -1,11 +1,10 @@
 #include <Adafruit_MotorShield.h>
 
 /// CHANGE THESE VARIABLES ///
-int MOTOR_DELAY = 20; // [ms]
+int MOTOR_DELAY = 30; // [ms]
 float Z_MAX = 5; // [cm] maximum scanline height
-float dz = 1; // [cm]
-float dtheta = 3.6; // must be more than 36 degrees
-
+float dz = 0.2; // [cm]
+float dtheta = 36; // must be a multiple of 3.6 degrees
 
 //////////////////////////////
 
@@ -45,19 +44,10 @@ double measure_distance(){
 }
 
 void move_z(int dz_step){
-  for (int i=0; i<dz_step; i++){
-    //z_stepper: raise sensor
-    z_stepper->onestep(FORWARD,  SINGLE);
-    delay(MOTOR_DELAY);
-  }
-  
+  z_stepper->step(dz_step,FORWARD, SINGLE); 
 }
 void move_theta(int dtheta_step){
-  for (int i=0; i<dtheta_step; i++){
-    //theta_stepper: rotate table
-    //theta_stepper->onestep(FORWARD,  SINGLE);
-    delay(MOTOR_DELAY);
-  }
+  theta_stepper->step(dtheta_step,FORWARD, SINGLE);
 }
 void reset_z(){
   for( int i =0; i<Z_MAX*steps_per_cm; i++){
@@ -77,6 +67,8 @@ void setup() {
     while (1);
   }
   Serial.println("Motor Shield found.");
+
+
 
   // ultrasound
   pinMode(trig_pin, OUTPUT); // Sets the trigPin as an Output
@@ -104,15 +96,13 @@ void loop() {
     Serial.println(delimiter);
     
     for(float z = 0; z<Z_MAX; z+=dz){
-      for(float theta = 0; theta<3960; theta+=dtheta){
+      for(int theta = 0; theta<360; theta+=dtheta){
         d = measure_distance();
         Serial.println(d);
         move_theta(dtheta_step);       
       }
       Serial.println(delimiter);
       move_z(dz_step);
-
-      AFMS.begin();
     }
     Serial.println("Scan Complete");
     reset_z();
