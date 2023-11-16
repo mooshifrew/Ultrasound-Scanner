@@ -2,9 +2,11 @@
 
 /// CHANGE THESE VARIABLES ///
 int MOTOR_DELAY = 20; // [ms]
-float Z_MAX = 5; // [cm] maximum scanline height
+float Z_MAX = 10; // [cm] maximum scanline height
 float dz = 1; // [cm]
-float dtheta = 3.6; // must be more than 36 degrees
+
+// Common Multiples: 3.6, 7.2, 18.0, 36.0, 72.0 (only 18 and greater seems to work)
+float dtheta = 18; // must be more than 36 degrees <- not true
 
 
 //////////////////////////////
@@ -18,6 +20,7 @@ const int button_pin = 2;
 int steps_per_cm = 100;
 int dz_step = dz*steps_per_cm; // number of motor steps between scan planes
 int dtheta_step = (int) dtheta/3.6; // number of motor steps
+int num_steps = 360/dtheta; //steps for 360 degree turn
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *z_stepper = AFMS.getStepper(100, 1);
@@ -55,7 +58,7 @@ void move_z(int dz_step){
 void move_theta(int dtheta_step){
   for (int i=0; i<dtheta_step; i++){
     //theta_stepper: rotate table
-    //theta_stepper->onestep(FORWARD,  SINGLE);
+    theta_stepper->onestep(FORWARD,  SINGLE);
     delay(MOTOR_DELAY);
   }
 }
@@ -77,14 +80,15 @@ void setup() {
     while (1);
   }
   Serial.println("Motor Shield found.");
+  Serial.println("Press green button to start scanning.");
 
   // ultrasound
   pinMode(trig_pin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echo_pin, INPUT); // Sets the echoPin as an Input
   pinMode(button_pin, INPUT); 
 
-  z_stepper->setSpeed(100);
-  theta_stepper->setSpeed(100);
+  z_stepper->setSpeed(255);
+  theta_stepper->setSpeed(255);
 }
 
 void loop() {
@@ -104,10 +108,10 @@ void loop() {
     Serial.println(delimiter);
     
     for(float z = 0; z<Z_MAX; z+=dz){
-      for(float theta = 0; theta<3960; theta+=dtheta){
+      for(int i = 0; i < num_steps; i+=1){// theta = 0; theta<360; theta+=dtheta){
         d = measure_distance();
         Serial.println(d);
-        move_theta(dtheta_step);       
+        move_theta(dtheta_step); 
       }
       Serial.println(delimiter);
       move_z(dz_step);

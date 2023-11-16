@@ -29,9 +29,14 @@ while loop:
         while not scan_complete:
             data = ser.readline().decode('utf-8').strip()
             print(data)
-            scan_complete = data=="Scan Complete"
+            if data == 'Scan Complete':
+                scan_complete = True
             if not scan_complete:
-                raw_data.append(float(data))
+                try:
+                    raw_data.append(float(data))
+                except ValueError:
+                    print(f"unable to convert data to float, {data} skipped")
+
 
         # Process Data
         
@@ -45,8 +50,8 @@ while loop:
    
         r = np.zeros((len(indices)-1, indices[0]))
 
-        #  raw_data.to_csv('raw_data.csv')
-        np.savetxt("ultrasound_data.txt",raw_data)
+        # save data in txt
+        np.savetxt("ultrasound_data_paper.txt",raw_data)
 
         r[0,:] = raw_data[0:indices[0]]
         for i in range(1,len(indices)-1):
@@ -69,6 +74,7 @@ while loop:
 
         pc_data_unfiltered=np.array( list(zip(x.flatten(), y.flatten(), z.flatten())))
 
+        # filtering
         for i in range(0, x.shape[0]):
             if np.sum(np.isnan(x[i, :]))==x.shape[1]:
                 x[i:, :]=[]
