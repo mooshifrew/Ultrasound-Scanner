@@ -2,7 +2,7 @@
 
 /// CHANGE THESE VARIABLES ///
 int MOTOR_DELAY = 30; // [ms]
-float Z_MAX = 5; // [cm] maximum scanline height
+float Z_MAX = 10; // [cm] maximum scanline height
 float dz = 0.2; // [cm]
 float dtheta = 36; // must be a multiple of 3.6 degrees
 

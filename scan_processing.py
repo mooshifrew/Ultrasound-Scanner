@@ -12,7 +12,7 @@ raw_data = []
 # scan conversion variables
 maxDistance = 18.0 # [cm]
 minDistance =  2.0 # [cm]
-sensor2CenterDistance = 9.0 #[cm]
+sensor2CenterDistance = 8.85 #[cm]
 loop=True 
 
 while loop:
@@ -51,7 +51,7 @@ while loop:
         r = np.zeros((len(indices)-1, indices[0]))
 
         # save data in txt
-        np.savetxt("ultrasound_data_paper.txt",raw_data)
+        np.savetxt("center_test.txt",raw_data)
 
         r[0,:] = raw_data[0:indices[0]]
         for i in range(1,len(indices)-1):
