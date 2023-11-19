@@ -4,6 +4,7 @@ import pyvista as pv
 from scipy.signal import convolve2d
 
 
+
 port = input("What port is in use? (eg COM3): ")
 ser = serial.Serial(port, 9600)  # Adjust the port and baud rate to match Arduino
 
@@ -52,13 +53,19 @@ while loop:
 
         # raw_data[raw_data>maxDistance] = np.NaN
    
-        r = np.zeros((len(indices)-1, indices[0], txPerScan))
+        r_unprocessed = np.zeros((len(indices)-1, indices[0], txPerScan))
+        r = np.zeros((len(indices)-1, indices[0]))
 
-        for z in range(0, r.shape[0]):
-            for theta in range(0,r.shape[1]):
-                for scan in range(0, r.shape[2]):
-                    r[theta, z, scan] = raw_data[z*r.shape[0] + theta*r.shape[1] + scan]
+        for z in range(0, r_unprocessed.shape[0]):
+            for theta in range(0,r_unprocessed.shape[1]):
+                for scan in range(0, r_unprocessed.shape[2]):
+                    r_unprocessed[z, theta, scan] = raw_data[z*r_unprocessed.shape[1] + theta*r_unprocessed.shape[2] + scan]
 
+        for z in range(0, r_unprocessed.shape[0]):
+            for theta in range(0, r_unprocessed.shape[1]):
+                r[z, theta] = np.mean(r_unprocessed[r, theta, (r_unprocessed[r,theta,:]!=None)])
+        
+        
         # distances converted to radius measurements
         r = sensor2CenterDistance - r
 
