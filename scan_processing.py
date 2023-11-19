@@ -37,9 +37,7 @@ while loop:
                 except ValueError:
                     print(f"unable to convert data to float, {data} skipped")
 
-        # save data in txt
-        np.savetxt("ultrasound_data_paper.txt",raw_data)
-        
+
         # Process Data
         
         raw_data = np.array(raw_data)
@@ -52,7 +50,8 @@ while loop:
    
         r = np.zeros((len(indices)-1, indices[0]))
 
-
+        # save data in txt
+        np.savetxt("ultrasound_data_paper.txt",raw_data)
 
         r[0,:] = raw_data[0:indices[0]]
         for i in range(1,len(indices)-1):
