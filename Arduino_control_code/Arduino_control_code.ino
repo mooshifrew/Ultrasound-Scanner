@@ -112,13 +112,14 @@ void loop() {
     
     for(float z = 0; z<Z_MAX; z+=dz){
       for(int i = 0; i < num_steps; i+=1){// theta = 0; theta<360; theta+=dtheta){
-        d = measure_distance();
-        Serial.println(d);
+        for(int scan = 0; scan<tx_per_scan; scan++){
+          d = measure_distance();
+          Serial.println(d);
+        }
         move_theta(dtheta_step); 
       }
       Serial.println(delimiter);
       move_z(dz_step);
-
       AFMS.begin();
     }
     Serial.println("Scan Complete");
