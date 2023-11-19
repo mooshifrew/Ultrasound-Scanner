@@ -30,9 +30,11 @@ Adafruit_StepperMotor *theta_stepper = AFMS.getStepper(100, 2);
 const int trig_pin = 5;
 const int echo_pin = 6;
 const float delimiter = 1234;
+const int tx_per_scan = 5; 
 double d;
 
 double measure_distance(){
+  double distanceSum = 0;
   // Clears the trigPin
   digitalWrite(trig_pin, LOW);
   delayMicroseconds(2);
@@ -106,16 +108,18 @@ void loop() {
     Serial.println(dz);
     Serial.println(dtheta);
     Serial.println(delimiter);
+    Serial.println(tx_per_scan);
     
     for(float z = 0; z<Z_MAX; z+=dz){
       for(int i = 0; i < num_steps; i+=1){// theta = 0; theta<360; theta+=dtheta){
-        d = measure_distance();
-        Serial.println(d);
+        for(int scan = 0; scan<tx_per_scan; scan++){
+          d = measure_distance();
+          Serial.println(d);
+        }
         move_theta(dtheta_step); 
       }
       Serial.println(delimiter);
       move_z(dz_step);
-
       AFMS.begin();
     }
     Serial.println("Scan Complete");

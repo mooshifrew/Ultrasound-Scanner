@@ -12,7 +12,7 @@ raw_data = []
 # scan conversion variables
 maxDistance = 18.0 # [cm]
 minDistance =  2.0 # [cm]
-sensor2CenterDistance = 9.0 #[cm]
+sensor2CenterDistance = 8.85 #[cm]
 loop=True 
 
 while loop:
@@ -23,6 +23,7 @@ while loop:
         dz = float(ser.readline().decode('utf-8').strip())
         dtheta = float(ser.readline().decode('utf-8').strip())
         delimiter = float(ser.readline().decode('utf-8').strip())
+        txPerScan = int(ser.readline().decode('utf-8').strip())
 
         scan_complete = False
 
@@ -39,6 +40,9 @@ while loop:
 
 
         # Process Data
+
+        # save data in txt
+        np.savetxt("center_test.txt",raw_data)
         
         raw_data = np.array(raw_data)
         raw_data[raw_data<minDistance] = None
@@ -48,14 +52,12 @@ while loop:
 
         # raw_data[raw_data>maxDistance] = np.NaN
    
-        r = np.zeros((len(indices)-1, indices[0]))
+        r = np.zeros((len(indices)-1, indices[0], txPerScan))
 
-        # save data in txt
-        np.savetxt("ultrasound_data_paper.txt",raw_data)
-
-        r[0,:] = raw_data[0:indices[0]]
-        for i in range(1,len(indices)-1):
-            r[i,:] = raw_data[indices[i-1]+1:indices[i]]
+        for z in range(0, r.shape[0]):
+            for theta in range(0,r.shape[1]):
+                for scan in range(0, r.shape[2]):
+                    r[theta, z, scan] = raw_data[z*r.shape[0] + theta*r.shape[1] + scan]
 
         # distances converted to radius measurements
         r = sensor2CenterDistance - r
