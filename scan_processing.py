@@ -50,12 +50,10 @@ while loop:
             raw_data[raw_data<minDistance] = None
             raw_data[raw_data>maxDistance] = None
             
+            depths = np.reshape(raw_data, (len(raw_data)//5, 5))
+            depths = depths[::-1, :]
 
-            depths = np.reshape(raw_data, [5, len(raw_data)//5])
-            depths = np.transpose(depths)
-
-
-            sensor_width = 1 # set this based on physical system
+            sensor_width = 3 # set this based on physical system
 
             x_min = -2 * sensor_width
             x_max = 2 * sensor_width

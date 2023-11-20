@@ -2,7 +2,7 @@
 
 /// CHANGE THESE VARIABLES ///
 int MOTOR_DELAY = 20; // [ms]
-float Z_MAX = 10; // [cm] maximum scanline height
+float Z_MAX = 15; // [cm] MAX IS 15!!!
 float dz = 0.5; // [cm]
 
 // Common Multiples: 3.6, 7.2, 18.0, 36.0, 72.0 (only 18 and greater seems to work)
@@ -26,13 +26,13 @@ int dtheta_step = (int) dtheta/3.6; // number of motor steps
 int num_steps = 3960/dtheta; //steps for 360 degree turn
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_StepperMotor *z_stepper = AFMS.getStepper(100, 1);
-Adafruit_StepperMotor *theta_stepper = AFMS.getStepper(100, 2);
+Adafruit_StepperMotor *z_stepper = AFMS.getStepper(100, 2);
+Adafruit_StepperMotor *theta_stepper = AFMS.getStepper(100, 1);
 
 // SCAN RELATED //
 const int n_scanners = 5;
-const int tx_Pins[n_scanners] = {13,7,5,3,1}; // 5 is the center sensor
-const int rx_Pins[n_scanners] = {8 ,6,4,2,0}; // 4 is center sensor
+const int tx_Pins[n_scanners] = {13,7,5,3,A2}; // 5 is the center sensor
+const int rx_Pins[n_scanners] = {8 ,6,4,2,A3}; // 4 is center sensor
 
 const float delimiter = 1234;
 const int tx_per_scan = 5; 
@@ -80,7 +80,7 @@ void move_theta(int dtheta_step){
   }
 }
 void reset_z(){
-  for( int i =0; i<Z_MAX*steps_per_cm; i++){
+  for( int i =0; i<(Z_MAX/dz*dz_step); i++){
     z_stepper->onestep(BACKWARD, SINGLE);
     delay(MOTOR_DELAY);
   }
@@ -114,9 +114,8 @@ void setup() {
 
 void loop() {
 
-  // s2D = digitalRead(pin2D);
-  // s3D = digitalRead(pin3D);
-  s2D=HIGH;
+  s2D = digitalRead(pin2D);
+  s3D = digitalRead(pin3D);
 
   if(s2D == HIGH){
     scan = true;
