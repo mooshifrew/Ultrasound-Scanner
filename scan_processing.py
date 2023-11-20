@@ -13,7 +13,7 @@ raw_data = []
 # scan conversion variables
 maxDistance = 18.0 # [cm]
 minDistance =  2.0 # [cm]
-sensor2CenterDistance = 8.85 #[cm]
+sensor2CenterDistance = 8.6 #[cm]
 loop=True 
 
 while loop:
@@ -43,7 +43,7 @@ while loop:
         # Process Data
 
         # save data in txt
-        np.savetxt("center_test.txt",raw_data)
+        np.savetxt("pleasework.txt",raw_data)
         
         raw_data = np.array(raw_data)
         raw_data[raw_data<minDistance] = None
@@ -53,17 +53,17 @@ while loop:
 
         # raw_data[raw_data>maxDistance] = np.NaN
    
-        r_unprocessed = np.zeros((len(indices)-1, indices[0], txPerScan))
-        r = np.zeros((len(indices)-1, indices[0]))
+        r_unprocessed = np.zeros((len(indices)-1, indices[0]//txPerScan, txPerScan))
+        r = np.zeros((len(indices)-1, indices[0]//txPerScan))
 
-        for z in range(0, r_unprocessed.shape[0]):
-            for theta in range(0,r_unprocessed.shape[1]):
-                for scan in range(0, r_unprocessed.shape[2]):
+        for z in range(r_unprocessed.shape[0]):
+            for theta in range(r_unprocessed.shape[1]):
+                for scan in range(r_unprocessed.shape[2]):
                     r_unprocessed[z, theta, scan] = raw_data[z*r_unprocessed.shape[1] + theta*r_unprocessed.shape[2] + scan]
 
         for z in range(0, r_unprocessed.shape[0]):
             for theta in range(0, r_unprocessed.shape[1]):
-                r[z, theta] = np.mean(r_unprocessed[r, theta, (r_unprocessed[r,theta,:]!=None)])
+                r[z, theta] = np.mean(r_unprocessed[z, theta, (r_unprocessed[z,theta,:]!=None)])
         
         
         # distances converted to radius measurements
@@ -138,7 +138,7 @@ while loop:
         pc_data = np.array(pc_list)
 
         # cloud = pv.PolyData(pc_data)
-        cloud = pv.PolyData(pc_data_unfiltered)
+        cloud = pv.PolyData(pc_data)
         cloud.plot()
 
         if input("create a mesh object? (yes/no): ")=='yes':

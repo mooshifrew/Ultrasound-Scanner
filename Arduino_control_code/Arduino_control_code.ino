@@ -6,7 +6,7 @@ float Z_MAX = 10; // [cm] maximum scanline height
 float dz = 1; // [cm]
 
 // Common Multiples: 3.6, 7.2, 18.0, 36.0, 72.0 (only 18 and greater seems to work)
-float dtheta = 18; // must be more than 36 degrees <- not true
+float dtheta = 39.6; // must be more than 36 degrees <- not true
 
 
 //////////////////////////////
@@ -20,7 +20,7 @@ const int button_pin = 2;
 int steps_per_cm = 100;
 int dz_step = dz*steps_per_cm; // number of motor steps between scan planes
 int dtheta_step = (int) dtheta/3.6; // number of motor steps
-int num_steps = 360/dtheta; //steps for 360 degree turn
+int num_steps = 3960/dtheta; //steps for 360 degree turn
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *z_stepper = AFMS.getStepper(100, 1);
@@ -34,7 +34,7 @@ const int tx_per_scan = 5;
 double d;
 
 double measure_distance(){
-  double distanceSum = 0;
+  delay(50);
   // Clears the trigPin
   digitalWrite(trig_pin, LOW);
   delayMicroseconds(2);
@@ -117,10 +117,14 @@ void loop() {
           Serial.println(d);
         }
         move_theta(dtheta_step); 
+        delay(500);
       }
       Serial.println(delimiter);
-      move_z(dz_step);
-      AFMS.begin();
+      if(z != Z_MAX - 1){
+        move_z(dz_step);
+        AFMS.begin();
+      }
+ 
     }
     Serial.println("Scan Complete");
     reset_z();
