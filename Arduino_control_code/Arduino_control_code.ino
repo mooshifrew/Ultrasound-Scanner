@@ -31,8 +31,8 @@ Adafruit_StepperMotor *theta_stepper = AFMS.getStepper(100, 2);
 
 // SCAN RELATED //
 const int n_scanners = 5;
-const int tx_Pins = {22, 24, 26, 28, 30}; // 26 is the center one
-const int rx_Pins = {23, 25, 27, 29, 31}; // 36 is center 
+const int tx_Pins[n_scanners] = {10, 10,10,10,10}; // 26 is the center one
+const int rx_Pins[n_scanners] = {9, 9, 9,9,9}; // 36 is center 
 
 const float delimiter = 1234;
 const int tx_per_scan = 5; 
@@ -94,15 +94,15 @@ void setup() {
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
     Serial.println("Could not find Motor Shield. Check wiring.");
-    while (1);
+    // while (1);
   }
   Serial.println("Motor Shield found.");
   Serial.println("Press button to start scanning. Green=2D, Red=3D");
 
   // sensor pins
   for( int i = 0; i<5; i++){
-    pinMode(trig_Pins[i], OUTPUT); // set all trig pins
-    pinMode(echo_Pins[i], INPUT); // set all echo pins
+    pinMode(tx_Pins[i], OUTPUT); // set all trig pins
+    pinMode(rx_Pins[i], INPUT); // set all echo pins
   }
 
   pinMode(pin2D, INPUT);
@@ -114,8 +114,9 @@ void setup() {
 
 void loop() {
 
-  s2D = digitalRead(pin2D);
-  s3D = digitalRead(pin3D);
+  // s2D = digitalRead(pin2D);
+  // s3D = digitalRead(pin3D);
+  s2D=HIGH;
 
   if(s2D == HIGH){
     scan = true;
@@ -172,6 +173,7 @@ void loop() {
     Serial.println("Press button to start scanning. Green=2D, Red=3D");
   }
 
-  button_state = LOW;
+  s2D = LOW;
+  s3D = LOW;
   delay(1000);
 }
