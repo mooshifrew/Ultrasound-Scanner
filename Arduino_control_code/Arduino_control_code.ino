@@ -15,9 +15,9 @@ float dtheta = 39.6; // must be more than 36 degrees <- not true
 int scan_mode = 2; // 2 - 2D scanning; 3 - 3D scanning
 bool scan = false;
 bool s2D = LOW; 
-const int pin2D = 2; // green button
+const int pin2D = A0; // green button
 bool s3D = LOW;
-const int pin3D = 3; // red button
+const int pin3D = A1; // red button
 
 // MOTOR RELATED //
 int steps_per_cm = 100;
@@ -31,8 +31,8 @@ Adafruit_StepperMotor *theta_stepper = AFMS.getStepper(100, 2);
 
 // SCAN RELATED //
 const int n_scanners = 5;
-const int tx_Pins[n_scanners] = {10, 10,10,10,10}; // 26 is the center one
-const int rx_Pins[n_scanners] = {9, 9, 9,9,9}; // 36 is center 
+const int tx_Pins[n_scanners] = {13,7,5,3,1}; // 5 is the center sensor
+const int rx_Pins[n_scanners] = {8 ,6,4,2,0}; // 4 is center sensor
 
 const float delimiter = 1234;
 const int tx_per_scan = 5; 
