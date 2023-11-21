@@ -49,7 +49,7 @@ double measure_distance(int sensor_index = 2){
   int echo_pin = rx_Pins[sensor_index];
 
   // perform single scan as determined by the scan number
-  delay(50);
+  delay(100);
   // Clears the trigPin
   digitalWrite(trig_pin, LOW);
   delayMicroseconds(2);
@@ -80,7 +80,7 @@ void move_theta(int dtheta_step){
   }
 }
 void reset_z(){
-  for( int i =0; i<(Z_MAX/dz*dz_step); i++){
+  for( int i =0; i<(Z_MAX-dz)*steps_per_cm; i++){
     z_stepper->onestep(BACKWARD, SINGLE);
     delay(MOTOR_DELAY);
   }
@@ -89,7 +89,7 @@ void reset_z(){
 void setup() {
 
   Serial.begin(9600);           // set up Serial library at 9600 bps
-   Serial.println("Stepper test!");
+   Serial.println("XD");
 
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
