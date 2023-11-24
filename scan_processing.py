@@ -45,13 +45,19 @@ while loop:
         if scan_mode == 2:
             np.savetxt("2D_Scan_Data.txt", raw_data)
             
+            maxDistance = 10
+
             raw_data = np.array(raw_data)
             raw_data = np.array(raw_data)
             raw_data[raw_data<minDistance] = None
             raw_data[raw_data>maxDistance] = None
+
+            plotMax = 10
             
             depths = np.reshape(raw_data, (len(raw_data)//5, 5))
             depths = depths[::-1, :]
+
+            # binarized = np.where(((depths > minDistance) and (depths < plotMax)), [1, 0])
 
             sensor_width = 3 # set this based on physical system
 
@@ -60,7 +66,9 @@ while loop:
             z_min = 0
             z_max = Z_MAX
 
-            plt.imshow(depths, interpolation='nearest', extent=(x_min, x_max, z_min, z_max))
+            cmap = plt.cm.colors.ListedColormap(['orange', 'white'])
+
+            plt.imshow(depths, cmap=cmap, interpolation='nearest', extent=(x_min, x_max, z_min, z_max))
             plt.colorbar()
             plt.xlabel('X (cm)')
             plt.ylabel('Z (cm)')
@@ -84,7 +92,7 @@ while loop:
             raw_data = np.array(raw_data)
             raw_data[raw_data<minDistance] = None
             indices = np.where(raw_data==delimiter)
-            raw_data[raw_data>maxDistance]= None #maxDistance
+            raw_data[raw_data>maxDistance]= None
             indices = indices[0]
 
             # raw_data[raw_data>maxDistance] = np.NaN
@@ -173,20 +181,28 @@ while loop:
 
             pc_data = np.array(pc_list)
 
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(pc_data[:, 0], pc_data[:, 1], pc_data[:, 2], s=5)
+            ax.set_xlabel('X Label')
+            ax.set_ylabel('Y Label')
+            ax.set_zlabel('Z Label')
+            plt.show()
+
+            # # cloud = pv.PolyData(pc_data)
             # cloud = pv.PolyData(pc_data)
-            cloud = pv.PolyData(pc_data)
-            cloud.plot()
+            # cloud.plot()
 
-            if input("create a mesh object? (yes/no): ")=='yes':
-                volume = cloud.delaunay_3d()
-                shell = volume.extract_geometry()
-                shell.plot()
+            # if input("create a mesh object? (yes/no): ")=='yes':
+            #     volume = cloud.delaunay_3d()
+            #     shell = volume.extract_geometry()
+            #     shell.plot()
 
-            if input("Plot the mesh of the unfiltered? (yes/no): ")=='yes':
-                uf_cloud = pv.PolyData(pc_data_unfiltered)
-                volume =uf_cloud.delaunay_3d()
-                shell = volume.extract_geometry()
-                shell.plot()
+            # if input("Plot the mesh of the unfiltered? (yes/no): ")=='yes':
+            #     uf_cloud = pv.PolyData(pc_data_unfiltered)
+            #     volume =uf_cloud.delaunay_3d()
+            #     shell = volume.extract_geometry()
+            #     shell.plot()
 
         loop = False
             

@@ -6,7 +6,7 @@ float Z_MAX = 15; // [cm] MAX IS 15!!!
 float dz = 0.5; // [cm]
 
 // Common Multiples: 3.6, 7.2, 18.0, 36.0, 72.0 (only 18 and greater seems to work)
-float dtheta = 39.6; // must be more than 36 degrees <- not true
+float dtheta = 36; // must be more than 36 degrees <- not true
 
 
 //////////////////////////////
@@ -23,7 +23,7 @@ const int pin3D = A1; // red button
 int steps_per_cm = 100;
 int dz_step = dz*steps_per_cm; // number of motor steps between scan planes
 int dtheta_step = (int) dtheta/3.6; // number of motor steps
-int num_steps = 3960/dtheta; //steps for 360 degree turn
+int num_steps = 360/dtheta; //steps for 360 degree turn
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *z_stepper = AFMS.getStepper(100, 2);
@@ -58,7 +58,7 @@ double measure_distance(int sensor_index = 2){
   delayMicroseconds(10);
   digitalWrite(trig_pin, LOW);
   // Reads the echoPin, returns the sound wave travel time in microseconds
-  int duration = pulseIn(echo_pin, HIGH);
+  unsigned int duration = pulseIn(echo_pin, HIGH);
   // Calculating the distance
   double distance = duration * 0.034 / 2;
   return distance;
@@ -149,6 +149,7 @@ void loop() {
     }
 
     else if (scan_mode==3){
+      Z_MAX = 5;
       for(float z = 0; z<Z_MAX; z+=dz){
         for(int i = 0; i < num_steps; i+=1){// theta = 0; theta<360; theta+=dtheta){
           for(int scan = 0; scan<tx_per_scan; scan++){
