@@ -92,23 +92,27 @@ while loop:
             raw_data = np.array(raw_data)
             raw_data[raw_data<minDistance] = None
             indices = np.where(raw_data==delimiter)
-            raw_data[raw_data>maxDistance]= None
             indices = indices[0]
+            raw_data = np.delete(raw_data, indices)
+            raw_data[raw_data>maxDistance]= None
 
             # raw_data[raw_data>maxDistance] = np.NaN
     
-            r_unprocessed = np.zeros((len(indices)-1, indices[0]//txPerScan, txPerScan))
-            r = np.zeros((len(indices)-1, indices[0]//txPerScan))
+            height = len(indices)
+            num_angle_steps = indices[0]//txPerScan
 
-            for z in range(r_unprocessed.shape[0]):
-                for theta in range(r_unprocessed.shape[1]):
-                    for scan in range(r_unprocessed.shape[2]):
-                        r_unprocessed[z, theta, scan] = raw_data[z*r_unprocessed.shape[1] + theta*r_unprocessed.shape[2] + scan]
+            r_unprocessed = np.zeros((height, num_angle_steps, txPerScan))
+            r = np.zeros((height, num_angle_steps))
 
-            for z in range(0, r_unprocessed.shape[0]):
-                for theta in range(0, r_unprocessed.shape[1]):
-                    r[z, theta] = np.mean(r_unprocessed[z, theta, (r_unprocessed[z,theta,:]!=None)])
+            for z in range(height): 
+                for theta in range(num_angle_steps):
+                    for scan in range(txPerScan):
+                        r_unprocessed[z, theta, scan] = raw_data[z*num_angle_steps + theta*txPerScan + scan]
             
+
+            for z in range(height):
+                for theta in range(num_angle_steps):
+                    r[z, theta] = np.mean(r_unprocessed[z, theta, (r_unprocessed[z,theta,:]!= None)])
             
             # distances converted to radius measurements
             r = sensor2CenterDistance - r
@@ -128,81 +132,82 @@ while loop:
             pc_data_unfiltered=np.array( list(zip(x.flatten(), y.flatten(), z.flatten())))
 
             # filtering
-            for i in range(0, x.shape[0]):
-                if np.sum(np.isnan(x[i, :]))==x.shape[1]:
-                    x[i:, :]=[]
-                    y[i:, :]= []
-                    z[i:, :]= []
-                    break
+            # for i in range(x.shape[0]):
+            #     if np.sum(np.isnan(x[i, :]))==x.shape[1]:
+            #         x[i:, :]=[]
+            #         y[i:, :]= []
+            #         z[i:, :]= []
+            #         break
 
-            for i in range(0, x.shape[0]):
-                lastIdx = np.argmax(~np.isnan(x[i,:]))
-                lastX = x[i, lastIdx]
-                lastY = y[i, lastIdx]
-                for j in range(0, x.shape[1]):
-                    if ~np.isnan(x[i,j]):
-                        lastX = x[i,j]
-                        lastY = y[i,j]
-                    else:
-                        x[i,j] = lastX
-                        y[i,j] = lastY
-
-
-            interpIdx = np.arange(0, x.shape[0], 1)
-            xInterp = x[interpIdx, :]
-            yInterp = y[interpIdx, :]
-            zInterp = z[interpIdx, :]
-
-            window_size = 2
-
-            h = np.ones((window_size, window_size))/ (window_size**2)
-
-            # symmetric padding along rows
-            xInterp = np.pad(xInterp, ((0,0), (window_size, window_size)), mode='symmetric')
-            yInterp = np.pad(yInterp, ((0,0), (window_size, window_size)), mode='symmetric')
-
-            xInterp = convolve2d(xInterp, h)
-            yInterp = convolve2d(yInterp, h)
-
-            xInterp = xInterp[:, window_size:-window_size]
-            yInterp = yInterp[:, window_size:-window_size]
+            # for i in range(x.shape[0]):
+            #     lastIdx = np.argmax(~np.isnan(x[i,:]))
+            #     lastX = x[i, lastIdx]
+            #     lastY = y[i, lastIdx]
+            #     for j in range(0, x.shape[1]):
+            #         if ~np.isnan(x[i,j]):
+            #             lastX = x[i,j]
+            #             lastY = y[i,j]
+            #         else:
+            #             x[i,j] = lastX
+            #             y[i,j] = lastY
 
 
-            xInterp[:, -1]=xInterp[:, 0]
-            yInterp[:, -1]=yInterp[:, 0]
-            zInterp[:, -1]=zInterp[:, 0]
+            # interpIdx = np.arange(0, x.shape[0], 1)
+            # xInterp = x[interpIdx, :]
+            # yInterp = y[interpIdx, :]
+            # zInterp = z[interpIdx, :]
 
-            xTop = np.mean(xInterp[-1, :])
-            yTop = np.mean(yInterp[-1, :])
-            zTop = zInterp[-1, 0]
+            # window_size = 2
 
-            pc_list = list(zip(xInterp.flatten(), yInterp.flatten(), zInterp.flatten()))
-            pc_list.append((xTop, yTop, zTop))
+            # h = np.ones((window_size, window_size))/ (window_size**2)
 
-            pc_data = np.array(pc_list)
+            # # symmetric padding along rows
+            # xInterp = np.pad(xInterp, ((0,0), (window_size, window_size)), mode='symmetric')
+            # yInterp = np.pad(yInterp, ((0,0), (window_size, window_size)), mode='symmetric')
+
+            # xInterp = convolve2d(xInterp, h)
+            # yInterp = convolve2d(yInterp, h)
+
+            # xInterp = xInterp[:, window_size:-window_size]
+            # yInterp = yInterp[:, window_size:-window_size]
+
+
+            # xInterp[:, -1]=xInterp[:, 0]
+            # yInterp[:, -1]=yInterp[:, 0]
+            # zInterp[:, -1]=zInterp[:, 0]
+
+            # xTop = np.mean(xInterp[-1, :])
+            # yTop = np.mean(yInterp[-1, :])
+            # zTop = zInterp[-1, 0]
+
+            # pc_list = list(zip(xInterp.flatten(), yInterp.flatten(), zInterp.flatten()))
+            # pc_list.append((xTop, yTop, zTop))
+
+            # pc_data = np.array(pc_list)
 
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(pc_data[:, 0], pc_data[:, 1], pc_data[:, 2], s=5)
+            # ax.scatter(pc_data[:, 0], pc_data[:, 1], pc_data[:, 2], s=5)
+            ax.scatter(x,y,z, s = 100)
             ax.set_xlabel('X Label')
             ax.set_ylabel('Y Label')
             ax.set_zlabel('Z Label')
             plt.show()
 
-            # # cloud = pv.PolyData(pc_data)
             # cloud = pv.PolyData(pc_data)
-            # cloud.plot()
+            cloud = pv.PolyData(pc_data_unfiltered)
+            cloud.plot()
 
-            # if input("create a mesh object? (yes/no): ")=='yes':
-            #     volume = cloud.delaunay_3d()
-            #     shell = volume.extract_geometry()
-            #     shell.plot()
+            if input("create a mesh object? (yes/no): ")=='yes':
+                volume = cloud.delaunay_3d()
+                shell = volume.extract_geometry()
+                shell.plot()
 
-            # if input("Plot the mesh of the unfiltered? (yes/no): ")=='yes':
-            #     uf_cloud = pv.PolyData(pc_data_unfiltered)
-            #     volume =uf_cloud.delaunay_3d()
-            #     shell = volume.extract_geometry()
-            #     shell.plot()
+            if input("Plot the mesh of the unfiltered? (yes/no): ")=='yes':
+                uf_cloud = pv.PolyData(pc_data_unfiltered)
+                volume =uf_cloud.delaunay_3d()
+                shell = volume.extract_geometry()
+                shell.plot()
 
         loop = False
             
