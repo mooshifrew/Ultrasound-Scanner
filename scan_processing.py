@@ -107,7 +107,7 @@ while loop:
             for z in range(height): 
                 for theta in range(num_angle_steps):
                     for scan in range(txPerScan):
-                        r_unprocessed[z, theta, scan] = raw_data[z*num_angle_steps + theta*txPerScan + scan]
+                        r_unprocessed[z, theta, scan] = raw_data[z*num_angle_steps*txPerScan + theta*txPerScan + scan]
             
 
             for z in range(height):
