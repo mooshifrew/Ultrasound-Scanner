@@ -149,7 +149,7 @@ void loop() {
     }
 
     else if (scan_mode==3){
-      Z_MAX = 5;
+      Z_MAX = 10;
       for(float z = 0; z<Z_MAX; z+=dz){
         for(int i = 0; i < num_steps; i+=1){// theta = 0; theta<360; theta+=dtheta){
           for(int scan = 0; scan<tx_per_scan; scan++){
