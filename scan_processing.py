@@ -120,6 +120,8 @@ while loop:
 
             pc_data_unfiltered=np.array( list(zip(x.flatten(), y.flatten(), z.flatten())))
 
+            cloud = pv.PolyData(pc_data_unfiltered)
+
             # plot using matplotlib
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -128,10 +130,6 @@ while loop:
             ax.set_ylabel('Y Label')
             ax.set_zlabel('Z Label')
             plt.show()
-
-            # plot point cloud
-            cloud = pv.PolyData(pc_data_unfiltered)
-            cloud.plot()
 
             # plot mesh
             if input("create a mesh object? (yes/no): ")=='yes':
