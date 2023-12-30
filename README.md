@@ -54,7 +54,7 @@ Hardware components were arranged as follows:
 ## Usage
 
 To use this project: 
-1. Upload and run arduino code
+1. Upload and run Arduino_control_code.ino
 2. Run scan_processing.py
 3. Connect to correct port when prompted
 4. Press button to begin scan
